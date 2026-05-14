@@ -1,0 +1,41 @@
+entities:
+    App\Entity\Tables:
+        singular: 'Table'
+        plural: 'Tables'
+
+        properties:
+            id: "ID"
+            numTable: 'Table number'
+            description: 'Description'
+            maxGuests: 'Max guests'
+            listGuests: 'Guests'
+            guests: 'Guests count'
+            presentGuests: 'Present guests'
+
+    App\Entity\ListGuest:
+        singular: 'Guest'
+        plural: 'Guests'
+
+        properties:
+            id: "ID"
+            isPresent: "Presence"
+            name: "Full Name"
+            tables: "Table Number"
+
+    App\Entity\User:
+        singular: 'User'
+        plural: 'Users'
+
+        properties:
+            id: "ID"
+            username: "Login"
+            roles: "Role"
+
+menu:
+    tables: 'Tables'
+    guests: 'Guests'
+    user:   'Users'
+
+section:
+    user: "General bd"    
+    admin: "Admin bd"  

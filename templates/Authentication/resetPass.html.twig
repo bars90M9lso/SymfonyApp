@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reset password{% endblock %}
+
+{% block body %}
+    <h1>Сменна пароля</h1>
+
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm) }}
+        {{ form_row(registrationForm.username, {label: 'Логин '}) }}
+        {{ form_row(registrationForm.password, {label: 'Пароль '}) }}
+
+        <button type="submit" class="btn">Сменить</button>
+    {{ form_end(registrationForm) }}
+{% endblock %}

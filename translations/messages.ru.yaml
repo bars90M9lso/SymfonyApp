@@ -1,0 +1,41 @@
+entities:
+    App\Entity\Tables:
+        singular: 'Стол'
+        plural: 'Столы'
+
+        properties:
+            id: "ID"
+            numTable: 'Номер стола'
+            description: 'Описание'
+            maxGuests: 'Максимум гостей'
+            listGuests: 'Гости'
+            guests: 'Количество гостей'
+            presentGuests: 'Присутствуют' 
+
+    App\Entity\ListGuest:
+        singular: 'Гость'
+        plural: 'Гости'
+
+        properties:
+            id: "ID"
+            isPresent: "Присутствие"
+            name: "ФИО"
+            tables: "Номер стола"
+
+    App\Entity\User:
+        singular: 'Пользователь'
+        plural: 'Пользователи'
+
+        properties:
+            id: "ID"
+            username: "Логин"
+            roles: "Роль"
+
+menu:
+    tables: 'Столы'
+    guests: 'Гости'
+    user: 'Пользователи'
+
+section:
+    user: "Общие бд"    
+    admin: "Админ бд"  
