@@ -3,8 +3,8 @@
 ## 1. Клонирование проекта
 
 ```bash
-git clone <ссылка_на_репозиторий>
-cd <папка_проекта>
+git clone https://github.com/bars90M9lso/SymfonyApp
+cd SymfonyApp
 ```
 
 ---
