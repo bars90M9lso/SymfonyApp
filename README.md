@@ -1,6 +1,6 @@
-## Локальный запуск проекта Symfony
+# Локальный запуск проекта Symfony
 
-# 1. Клонирование проекта
+## 1. Клонирование проекта
 
 ```bash
 git clone <ссылка_на_репозиторий>
@@ -9,7 +9,7 @@ cd <папка_проекта>
 
 ---
 
-# 2. Установка зависимостей
+## 2. Установка зависимостей
 
 После скачивания проекта нужно установить все зависимости:
 
@@ -19,7 +19,7 @@ composer install
 
 ---
 
-# 3. Настройка файла `.env`
+## 3. Настройка файла `.env`
 
 Перед запуском необходимо настроить файл `.env`.
 
@@ -55,7 +55,7 @@ CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
 
 ---
 
-# 4. Создание базы данных
+## 4. Создание базы данных
 
 После настройки `.env` необходимо создать базу данных:
 
@@ -65,7 +65,7 @@ php bin/console doctrine:database:create
 
 ---
 
-# 5. Выполнение миграций
+## 5. Выполнение миграций
 
 ```bash
 php bin/console make:migration
@@ -74,7 +74,7 @@ php bin/console doctrine:migrations:migrate
 
 ---
 
-# 6. Запуск локального сервера
+## 6. Запуск локального сервера
 
 Для запуска локального сервера выполнить команду:
 
@@ -96,9 +96,9 @@ symfony server:stop
 
 ---
 
-## Полезные команды Symfony
+# Полезные команды Symfony
 
-# Очистка кеша
+## Очистка кеша
 
 После изменения конфигурации, сущностей или контроллеров рекомендуется очищать кеш:
 
@@ -109,7 +109,7 @@ php bin/console cache:warmup
 
 ---
 
-# Просмотр всех роутов
+## Просмотр всех роутов
 
 ```bash
 php bin/console debug:router
@@ -117,7 +117,7 @@ php bin/console debug:router
 
 ---
 
-# Создание контроллера
+## Создание контроллера
 
 ```bash
 php bin/console make:controller NameController
@@ -131,9 +131,9 @@ php bin/console make:controller NameController
 
 ---
 
-## Работа с базой данных
+# Работа с базой данных
 
-# Установка Doctrine ORM
+## Установка Doctrine ORM
 
 Если ORM еще не установлен:
 
@@ -144,7 +144,7 @@ composer require --dev symfony/maker-bundle
 
 ---
 
-# Настройка подключения к БД
+## Настройка подключения к БД
 
 Symfony поддерживает несколько типов БД.
 
@@ -174,7 +174,7 @@ DATABASE_URL="postgresql://db_user:db_password@127.0.0.1:5432/db_name?serverVers
 
 ---
 
-# Создание сущностей
+## Создание сущностей
 
 ```bash
 php bin/console make:entity
@@ -188,7 +188,7 @@ php bin/console make:entity
 
 ---
 
-# Создание миграций
+## Создание миграций
 
 После изменения сущностей необходимо создать миграцию:
 
@@ -204,7 +204,7 @@ php bin/console make:migration
 
 ---
 
-# Применение миграций
+## Применение миграций
 
 ```bash
 php bin/console doctrine:migrations:migrate
@@ -212,7 +212,7 @@ php bin/console doctrine:migrations:migrate
 
 ---
 
-# Создание связей между сущностями
+## Создание связей между сущностями
 
 Связи (`OneToMany`, `ManyToOne`, `ManyToMany`) можно создавать через:
 
@@ -224,7 +224,7 @@ php bin/console make:entity
 
 ---
 
-## Работа с API Platform
+# Работа с API Platform
 
 При использовании API Platform API создаются автоматически на основе сущностей.
 
@@ -250,11 +250,11 @@ class Product
 
 ---
 
-## Работа с EasyAdmin
+# Работа с EasyAdmin
 
 Для создания административной панели используется EasyAdmin.
 
-# Создание Dashboard
+## Создание Dashboard
 
 ```bash
 php bin/console make:admin:dashboard
@@ -269,7 +269,7 @@ php bin/console make:admin:dashboard
 
 ---
 
-## Создание CRUD для сущности
+# Создание CRUD для сущности
 
 ```bash
 php bin/console make:admin:crud
