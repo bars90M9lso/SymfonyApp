@@ -20,24 +20,19 @@ class ResetPasswordType extends AbstractType
             [
                 'constraints' => 
                 [
-                    new NotBlank(message: 'Пожалуйста, введите логи',),
+                    new NotBlank(message: 'Пожалуйста, введите логин',),
                 ],
 
             ])
             
             ->add('password', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank(
-                        message: 'Please enter a password',
-                    ),
+                    new NotBlank(message: 'Пожалуйста, введите пароль',),
                     new Length(
                         min: 4,
-                        minMessage: 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
+                        minMessage: 'Минимальная длина пароля: 4 символа',
                         max: 4096,
                     ),
                 ],

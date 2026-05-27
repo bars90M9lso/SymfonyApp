@@ -20,27 +20,24 @@ class RegistrationFormType extends AbstractType
             [
                 'constraints' => 
                 [
-                    new NotBlank(message: 'Пожалуйста, введите логи',),
+                    new NotBlank(message: 'Пожалуйста, введите логин',),
                 ],
 
             ])
 
             ->add('password', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank(message: 'Пожалуйста, введите пароль',),
                     new Length(
                         min: 4,
-                        minMessage: 'Минимальная длина пароля 4 символа',
+                        minMessage: 'Минимальная длина пароля: 4 символа',
                         max: 4096,
                     ),
                 ],
             ])
         ;
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
