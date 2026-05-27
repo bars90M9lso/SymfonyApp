@@ -37,5 +37,5 @@ menu:
     user:   'Users'
 
 section:
-    user: "General bd"    
-    admin: "Admin bd"  
+    user: "General Data"
+    admin: "Administration"
