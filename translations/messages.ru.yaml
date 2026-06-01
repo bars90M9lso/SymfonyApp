@@ -1,5 +1,5 @@
 entities:
-    App\Entity\Tables:
+    App\Entity\Table:
         singular: 'Стол'
         plural: 'Столы'
 
@@ -20,7 +20,7 @@ entities:
             id: "ID"
             isPresent: "Присутствие"
             name: "ФИО"
-            tables: "Номер стола"
+            table: "Номер стола"
 
     App\Entity\User:
         singular: 'Пользователь'
@@ -30,6 +30,7 @@ entities:
             id: "ID"
             username: "Логин"
             roles: "Роль"
+            email: "Почта"
 
 menu:
     tables: 'Столы'
