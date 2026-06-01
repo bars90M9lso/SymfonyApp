@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
 class RegistrationFormType extends AbstractType
 {
@@ -24,7 +25,17 @@ class RegistrationFormType extends AbstractType
                 ],
 
             ])
+            
+            ->add('email', EmailType::class,
+            [
+                'attr' => ['autocomplete' => 'email'],
+                'constraints' => 
+                [
+                    new NotBlank(message: 'Пожалуйста, введите email',),
+                ],
 
+            ])
+            
             ->add('password', PasswordType::class, [
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
@@ -35,6 +46,8 @@ class RegistrationFormType extends AbstractType
                         minMessage: 'Минимальная длина пароля: 4 символа',
                         max: 4096,
                     ),
+                    //new PasswordStrength(),
+                    //new NotCompromisedPassword(),
                 ],
             ])
         ;

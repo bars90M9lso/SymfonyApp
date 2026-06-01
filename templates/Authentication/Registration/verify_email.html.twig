@@ -1,0 +1,73 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider #}
+{% set ea = ea() %}
+{% extends null != ea ? ea.templatePath('layout') : '@EasyAdmin/page/login_minimal.html.twig' %}
+{% trans_default_domain null != ea ? ea.i18n.translationDomain : (translation_domain is defined ? translation_domain ?? 'messages') %}
+
+{% block body_class 'page-login' %}
+{% block page_title %}Подтверждение почты{% endblock %}
+
+{% block head_favicon %}
+    {% if favicon_path|default(false) %}
+        <link rel="shortcut icon" href="{{ favicon_path }}">
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block wrapper_wrapper %}
+    {% set page_title = block('page_title') %}
+
+    {{ include('@EasyAdmin/flash_messages.html.twig') }}
+
+    <div class="login-wrapper">
+        <header class="main-header">
+            <div id="header-logo">
+                {% block header_logo %}
+                    {% if page_title %}
+                        {% if null != ea %}
+                            <a class="logo {{ page_title|length > 14 ? 'logo-long' }}" title="{{ page_title|striptags }}" href="{{ path(ea.dashboardRouteName) }}">
+                                {{ page_title|raw }}
+                            </a>
+                        {% else %}
+                            <div class="logo {{ page_title|length > 14 ? 'logo-long' }}">
+                                {{ page_title|raw }}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endblock header_logo %}
+            </div>
+        </header>
+
+        <section class="content">
+            {{ form_start(verificationForm) }}
+                {{ form_errors(verificationForm) }}
+
+                <div class="form-group">
+                    <p class="form-text">
+                        Мы отправили код подтверждения на вашу почту. Введите его ниже, чтобы завершить регистрацию.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(verificationForm.code, null, {'label_attr': {'class': 'form-control-label required'}}) }}
+                    <div class="form-widget">
+                        {{ form_widget(verificationForm.code, {'attr': {'class': 'form-control', 'autofocus': true}}) }}
+                    </div>
+                    {{ form_errors(verificationForm.code) }}
+                </div>
+
+                <twig:ea:Button type="submit" variant="primary" size="lg" isBlock htmlAttributes="{class: 'btn-block'}">Подтвердить</twig:ea:Button>
+            {{ form_end(verificationForm) }}
+
+            <div class="mt-3 text-center">
+                <a href="{{ path('login') }}">Вернуться ко входу</a>
+            </div>
+
+            {% guard function csp_nonce %}
+                <script src="{{ asset('login.js', constant('EasyCorp\\Bundle\\EasyAdminBundle\\Asset\\AssetPackage::PACKAGE_NAME')) }}" nonce="{{ csp_nonce('script') }}"></script>
+            {% else %}
+                <script src="{{ asset('login.js', constant('EasyCorp\\Bundle\\EasyAdminBundle\\Asset\\AssetPackage::PACKAGE_NAME')) }}"></script>
+            {% endguard %}
+        </section>
+    </div>
+{% endblock %}
