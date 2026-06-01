@@ -891,6 +891,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     enable_profiler?: bool|Param, // Whether or not to enable the profiler collector to calculate and visualize migration status. This adds some queries overhead. // Default: false
  *     transactional?: bool|Param, // Whether or not to wrap migrations in a single transaction. // Default: true
  * }
+ * @psalm-type DebugConfig = array{
+ *     max_items?: int|Param, // Max number of displayed items past the first level, -1 means no limit. // Default: 2500
+ *     min_depth?: int|Param, // Minimum tree depth to clone all the items, 1 is default. // Default: 1
+ *     max_string_length?: int|Param, // Max length of displayed strings, -1 means no limit. // Default: -1
+ *     dump_destination?: scalar|Param|null, // A stream URL where dumps should be written to. // Default: null
+ *     theme?: "dark"|"light"|Param, // Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light". // Default: "dark"
+ * }
  * @psalm-type TwigConfig = array{
  *     form_themes?: list<scalar|Param|null>,
  *     globals?: array<string, array{ // Default: []
@@ -922,6 +929,14 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     mailer?: array{
  *         html_to_text_converter?: scalar|Param|null, // A service implementing the "Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface". // Default: null
  *     },
+ * }
+ * @psalm-type WebProfilerConfig = array{
+ *     toolbar?: bool|array{ // Profiler toolbar configuration
+ *         enabled?: bool|Param, // Default: false
+ *         ajax_replace?: bool|Param, // Replace toolbar on AJAX requests // Default: false
+ *     },
+ *     intercept_redirects?: bool|Param, // Default: false
+ *     excluded_ajax_paths?: scalar|Param|null, // Default: "^/((index|app(_[\\w]+)?)\\.php/)?_wdt"
  * }
  * @psalm-type StimulusConfig = array{
  *     controller_paths?: list<scalar|Param|null>,
@@ -1435,33 +1450,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *     }>,
  * }
- * @psalm-type NelmioCorsConfig = array{
- *     defaults?: array{
- *         allow_credentials?: bool|Param, // Default: false
- *         allow_origin?: list<scalar|Param|null>,
- *         allow_headers?: list<scalar|Param|null>,
- *         allow_methods?: list<scalar|Param|null>,
- *         allow_private_network?: bool|Param, // Default: false
- *         expose_headers?: list<scalar|Param|null>,
- *         max_age?: scalar|Param|null, // Default: 0
- *         hosts?: list<scalar|Param|null>,
- *         origin_regex?: bool|Param, // Default: false
- *         forced_allow_origin_value?: scalar|Param|null, // Default: null
- *         skip_same_as_origin?: bool|Param, // Default: true
- *     },
- *     paths?: array<string, array{ // Default: []
- *         allow_credentials?: bool|Param,
- *         allow_origin?: list<scalar|Param|null>,
- *         allow_headers?: list<scalar|Param|null>,
- *         allow_methods?: list<scalar|Param|null>,
- *         allow_private_network?: bool|Param,
- *         expose_headers?: list<scalar|Param|null>,
- *         max_age?: scalar|Param|null, // Default: 0
- *         hosts?: list<scalar|Param|null>,
- *         origin_regex?: bool|Param,
- *         forced_allow_origin_value?: scalar|Param|null, // Default: null
- *         skip_same_as_origin?: bool|Param,
- *     }>,
+ * @psalm-type MakerConfig = array{
+ *     root_namespace?: scalar|Param|null, // Default: "App"
+ *     generate_final_classes?: bool|Param, // Default: true
+ *     generate_final_entities?: bool|Param, // Default: false
  * }
  * @psalm-type ApiPlatformConfig = array{
  *     title?: scalar|Param|null, // The title of the API. // Default: ""
@@ -1623,7 +1615,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         validation_error_resource_class?: scalar|Param|null, // The class used to represent validation errors in the OpenAPI documentation. // Default: null
  *     },
  *     maker?: bool|array{
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         namespace_prefix?: scalar|Param|null, // Add a prefix to all maker generated classes. e.g set it to "Api" to set the maker namespace to "App\Api\" (if the maker.root_namespace config is App). e.g. App\Api\State\MyStateProcessor // Default: ""
  *     },
  *     mcp?: bool|array{
@@ -1770,6 +1762,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         collect_components?: bool|Param, // Collect components instances // Default: true
  *     },
  * }
+ * @psalm-type SymfonycastsResetPasswordConfig = array{
+ *     request_password_repository?: scalar|Param|null, // A class that implements ResetPasswordRequestRepositoryInterface - usually your ResetPasswordRequestRepository.
+ *     lifetime?: int|Param, // The length of time in seconds that a password reset request is valid for after it is created. // Default: 3600
+ *     throttle_limit?: int|Param, // Another password reset cannot be made faster than this throttle time in seconds. // Default: 3600
+ *     enable_garbage_collection?: bool|Param, // Enable/Disable automatic garbage collection. // Default: true
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1783,9 +1781,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     twig_extra?: TwigExtraConfig,
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
- *     nelmio_cors?: NelmioCorsConfig,
  *     api_platform?: ApiPlatformConfig,
  *     twig_component?: TwigComponentConfig,
+ *     symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1793,15 +1791,18 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         framework?: FrameworkConfig,
  *         doctrine?: DoctrineConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
+ *         debug?: DebugConfig,
  *         twig?: TwigConfig,
+ *         web_profiler?: WebProfilerConfig,
  *         stimulus?: StimulusConfig,
  *         turbo?: TurboConfig,
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         nelmio_cors?: NelmioCorsConfig,
+ *         maker?: MakerConfig,
  *         api_platform?: ApiPlatformConfig,
  *         twig_component?: TwigComponentConfig,
+ *         symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1816,9 +1817,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         nelmio_cors?: NelmioCorsConfig,
  *         api_platform?: ApiPlatformConfig,
  *         twig_component?: TwigComponentConfig,
+ *         symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1828,14 +1829,15 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine?: DoctrineConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         twig?: TwigConfig,
+ *         web_profiler?: WebProfilerConfig,
  *         stimulus?: StimulusConfig,
  *         turbo?: TurboConfig,
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         nelmio_cors?: NelmioCorsConfig,
  *         api_platform?: ApiPlatformConfig,
  *         twig_component?: TwigComponentConfig,
+ *         symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

@@ -9,3 +9,9 @@
 
 controllers:
     resource: routing.controllers
+
+fallback:
+    path: /{any}
+    controller: App\Controller\FallBackController::index
+    requirements:
+        any: '.*'  

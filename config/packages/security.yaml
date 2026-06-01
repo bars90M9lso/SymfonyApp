@@ -18,6 +18,8 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         main:
+            access_denied_url: /login
+
             lazy: true
             provider: app_user_provider
 
@@ -38,8 +40,9 @@ security:
 
 
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin/.*/user, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/api, roles: ROLE_USER }
 
 when@test:
     security:
