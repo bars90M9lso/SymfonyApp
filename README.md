@@ -27,25 +27,31 @@ composer install
 
 ```env
 ###> symfony/framework-bundle ###
-APP_ENV=dev
+APP_ENV=prod
+APP_DEBUG=0
 APP_SECRET=your_secret_key
 APP_SHARE_DIR=var/share
 ###< symfony/framework-bundle ###
 
 ###> symfony/routing ###
-DEFAULT_URI=http://localhost
+DEFAULT_URI=http://domain.com
 ###< symfony/routing ###
 
 ###> doctrine/doctrine-bundle ###
 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_%kernel.environment%.db"
+# DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4"
+# DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
+# DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/messenger ###
+# MESSENGER_TRANSPORT_DSN=amqp://guest:guest@localhost:5672/%2f/messages
+# MESSENGER_TRANSPORT_DSN=redis://localhost:6379/messages
 MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
 ###< symfony/messenger ###
 
 ###> symfony/mailer ###
-MAILER_DSN=null://null
+MAILER_DSN=smtps://login:password@smtp.example.com:465
 ###< symfony/mailer ###
 
 ###> nelmio/cors-bundle ###
