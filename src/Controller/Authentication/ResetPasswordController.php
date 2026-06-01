@@ -8,6 +8,7 @@ use App\Form\ResetPasswordRequestFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,11 @@ class ResetPasswordController extends AbstractController
 
     public function __construct(
         private ResetPasswordHelperInterface $resetPasswordHelper,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        #[Autowire('%env(MAILER_FROM_EMAIL)%')]
+        private string $mailerFromEmail,
+        #[Autowire('%env(MAILER_FROM_NAME)%')]
+        private string $mailerFromName
     ) {
     }
 
@@ -151,7 +156,7 @@ class ResetPasswordController extends AbstractController
         }
 
         $email = (new TemplatedEmail())
-            ->from(new Address('alyosha.lekomtsev@yandex.ru', 'SymfonyApp'))
+            ->from(new Address($this->mailerFromEmail, $this->mailerFromName))
             ->to((string) $user->getEmail())
             ->subject('Your password reset request')
             ->htmlTemplate('Authentication/reset_password/email.html.twig')

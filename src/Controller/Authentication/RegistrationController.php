@@ -8,6 +8,7 @@ use App\Form\EmailVerificationCodeFormType;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,14 @@ use Symfony\Component\Mime\Address;
 
 class RegistrationController extends AbstractController
 {
+    public function __construct(
+        #[Autowire('%env(MAILER_FROM_EMAIL)%')]
+        private string $mailerFromEmail,
+        #[Autowire('%env(MAILER_FROM_NAME)%')]
+        private string $mailerFromName
+    ) {
+    }
+
     #[Route('/registration', name: 'registration')]
     public function registration(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entlMng, MailerInterface $mailer): Response 
     {
@@ -113,7 +122,7 @@ class RegistrationController extends AbstractController
     private function sendVerificationEmail(string $emailAddress, string $code, MailerInterface $mailer): void
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('alyosha.lekomtsev@yandex.ru', 'SymfonyApp'))
+            ->from(new Address($this->mailerFromEmail, $this->mailerFromName))
             ->to($emailAddress)
             ->subject('Код подтверждения регистрации')
             ->htmlTemplate('Authentication/Registration/email.html.twig')
