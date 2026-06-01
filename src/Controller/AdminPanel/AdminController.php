@@ -2,10 +2,6 @@
 
 namespace App\Controller\AdminPanel;
 
-use App\Controller\AdminPanel\ListGuestCrudController;
-use App\Controller\AdminPanel\TablesCrudController;
-use App\Controller\AdminPanel\UserCrudController;
-
 use function Symfony\Component\Translation\t;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,7 +10,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-
 
 #[AdminDashboard(routePath: '/admin/{_locale}', routeName: 'admin')]
 class AdminController extends AbstractDashboardController
@@ -28,7 +23,7 @@ class AdminController extends AbstractDashboardController
         }
 
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        $url = $adminUrlGenerator->setController(TablesCrudController::class)->generateUrl();
+        $url = $adminUrlGenerator->setController(TableCrudController::class)->generateUrl();
 
         return $this->redirect($url);
     }
@@ -36,7 +31,6 @@ class AdminController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-
             ->setTitle('Административная панель')
             ->renderContentMaximized()
             ->setDefaultColorScheme('dark')
@@ -50,28 +44,16 @@ class AdminController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {   
-        $menuItems = [];
+        $menuItems = [
+            MenuItem::section("section.user"),
+            MenuItem::linkTo(TableCrudController::class, t('menu.tables'), 'fa-solid fa-tablet-screen-button'),
+            MenuItem::linkTo(ListGuestCrudController::class, t('menu.guests'), 'fa fa-users'),
+        ];
 
         if ($this->isGranted('ROLE_ADMIN'))
         {
-            $menuItems =
-            [
-                MenuItem::section("section.user"),
-                MenuItem::linkTo(TablesCrudController::class, t('menu.tables'), 'fa-solid fa-tablet-screen-button'),
-                MenuItem::linkTo(ListGuestCrudController::class, t('menu.guests'), 'fa fa-users'),
-                MenuItem::section("section.admin"),
-                MenuItem::linkTo(UserCrudController::class, t('menu.user'), 'fa fa-users'),
-            ];
-        }
-
-        if ($this->isGranted('ROLE_USER'))
-        {
-            $menuItems =
-            [   
-                MenuItem::section("section.user"),
-                MenuItem::linkTo(TablesCrudController::class, t('menu.tables'), 'fa-solid fa-tablet-screen-button'),
-                MenuItem::linkTo(ListGuestCrudController::class, t('menu.guests'), 'fa fa-users'),
-            ];
+            $menuItems[] = MenuItem::section("section.admin");
+            $menuItems[] = MenuItem::linkTo(UserCrudController::class, t('menu.user'), 'fa fa-users');   
         }
 
         return $menuItems;
