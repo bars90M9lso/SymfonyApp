@@ -2,14 +2,20 @@
 
 namespace App\Entity;
 
+
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
+#[UniqueEntity(fields: ['username'], message: 'Такой логин уже существует')]
+#[UniqueEntity(fields: ['email'], message: 'Пользователь с таким e-mail уже зарегистрирован')]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -31,6 +37,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    private ?string $plainPassword = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -65,8 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        //$roles[] = 'ROLE_USER';
+        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
@@ -106,4 +127,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $data;
     }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
 }
