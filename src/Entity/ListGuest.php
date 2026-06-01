@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ListGuestRepository;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -46,8 +47,9 @@ class ListGuest
 
     #[ORM\ManyToOne(inversedBy: 'listGuests')]
     #[Groups(['listguests:read', 'listguests:write'])]
-    private ?Tables $tables = null;
-
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[MaxDepth(1)]
+    private ?Table $table = null;
 
     public function getId(): ?int
     {
@@ -66,7 +68,7 @@ class ListGuest
         return $this;
     }
 
-    public function isPresent(): ?bool
+    public function getIsPresent(): ?bool
     {
         return $this->isPresent;
     }
@@ -78,14 +80,14 @@ class ListGuest
         return $this;
     }
 
-    public function getTables(): ?Tables
+    public function getTable(): ?Table
     {
-        return $this->tables;
+        return $this->table;
     }
 
-    public function setTables(?Tables $tables): static
+    public function setTable(?Table $table): static
     {
-        $this->tables = $tables;
+        $this->table = $table;
 
         return $this;
     }

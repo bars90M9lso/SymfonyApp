@@ -2,34 +2,47 @@
 
 namespace App\ApiResource;
 
-use App\Repository\TablesRepository;
+use App\Repository\TableRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class TableStatsController extends AbstractController
 {
-    public function __invoke(Request $request, TablesRepository $repository): JsonResponse
+    public function __invoke(Request $request, TableRepository $repository): JsonResponse
     {
         $numTable = $request->query->get('numTable');
+
+        if ($numTable === null || $numTable === '') 
+        {
+            $tables = $repository->findAll();
+
+            return $this->json(array_map(function ($table) 
+            {
+                return $this->tableToStats($table);
+            }, $tables));
+        }
 
         $table = $repository->findOneBy([
             'numTable' => $numTable  
         ]);
 
-        if (!$table) {
-            return $this->json([
-                'error' => 'Table not found'
-            ], 404);
+        if (!$table) 
+        {
+            return $this->json(['error' => 'Table not found'], 404);
         }
 
-        return $this->json([
+        return $this->tableToStats($table);
+    }
+
+    private function tableToStats(Table $table): array
+    {
+        return [
             'id' => $table->getId(),
-            'table_number' => $table->getNumTable(),
-            'description' => $table->getDescription(),
+            'number' => $table->getNumTable(),
             'max_guests' => $table->getMaxGuests(),
             'total_guests' => $table->getGuests(),
             'present_guests' => $table->getPresentGuests(),
-        ]);
+        ];
     }
 }

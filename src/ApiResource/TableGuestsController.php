@@ -2,13 +2,13 @@
 
 namespace App\ApiResource;
 
-use App\Entity\Tables;
+use App\Entity\Table;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TableGuestsController extends AbstractController
 {
-    public function __invoke(Tables $table): JsonResponse
+    public function __invoke(Table $table): JsonResponse
     {
         $guests = $table->getListGuests()->toArray();           
         return $this->json($guests);
