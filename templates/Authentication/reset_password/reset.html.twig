@@ -1,0 +1,71 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider #}
+{% set ea = ea() %}
+{% extends null != ea ? ea.templatePath('layout') : '@EasyAdmin/page/login_minimal.html.twig' %}
+{% trans_default_domain null != ea ? ea.i18n.translationDomain : (translation_domain is defined ? translation_domain ?? 'messages') %}
+
+{% block body_class 'page-login' %}
+{% block page_title %}{{ page_title is defined ? page_title|raw : (null != ea ? ea.dashboardTitle|raw : '') }}{% endblock %}
+
+{% block head_favicon %}
+    {% if favicon_path|default(false) %}
+        <link rel="shortcut icon" href="{{ favicon_path }}">
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block wrapper_wrapper %}
+    {% set page_title = block('page_title') %}
+
+    {{ include('@EasyAdmin/flash_messages.html.twig') }}
+
+    <div class="login-wrapper">
+        <header class="main-header">
+            <div id="header-logo">
+                {% block header_logo %}
+                    {% if page_title %}
+                        {% if null != ea %}
+                            <a class="logo {{ page_title|length > 14 ? 'logo-long' }}" title="{{ page_title|striptags }}" href="{{ path(ea.dashboardRouteName) }}">
+                                {{ page_title|raw }}
+                            </a>
+                        {% else %}
+                            <div class="logo {{ page_title|length > 14 ? 'logo-long' }}">
+                                {{ page_title|raw }}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endblock header_logo %}
+            </div>
+        </header>
+
+        <section class="content">
+            {{ form_start(resetForm, {'attr': {'novalidate': 'novalidate', 'autocomplete': 'off'}}) }}
+
+                {% if resetForm.vars.errors|length > 0 %}
+                    <div class="alert alert-danger">{{ form_errors(resetForm) }}</div>
+                {% endif %}
+
+                <div class="form-group">
+                    {{ form_row(resetForm.plainPassword, {
+                        'label': 'Новый пароль',
+                        'attr': {'class': 'form-control', 'autocomplete': 'new-password', 'autofocus': true}
+                    }) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Изменить пароль</button>
+
+                <div class="mt-3 text-center">
+                    <span>Уже есть доступ?</span>
+                    <a href="{{ path('login') }}">Войти</a>
+                </div>
+
+            {{ form_end(resetForm) }}
+
+            {% guard function csp_nonce %}
+                <script src="{{ asset('login.js', constant('EasyCorp\\Bundle\\EasyAdminBundle\\Asset\\AssetPackage::PACKAGE_NAME')) }}" nonce="{{ csp_nonce('script') }}"></script>
+            {% else %}
+                <script src="{{ asset('login.js', constant('EasyCorp\\Bundle\\EasyAdminBundle\\Asset\\AssetPackage::PACKAGE_NAME')) }}"></script>
+            {% endguard %}
+        </section>
+    </div>
+{% endblock %}
