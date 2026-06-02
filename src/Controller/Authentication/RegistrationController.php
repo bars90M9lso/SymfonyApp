@@ -20,6 +20,10 @@ use Symfony\Component\Mime\Address;
 
 class RegistrationController extends AbstractController
 {
+
+    private const VERIFICATION_CODE_TTL = 600;
+    private const MAX_VERIFICATION_ATTEMPTS = 5;
+
     public function __construct(
         #[Autowire('%env(MAILER_FROM_EMAIL)%')]
         private string $mailerFromEmail,
@@ -40,11 +44,13 @@ class RegistrationController extends AbstractController
             $existingUser = $entlMng->getRepository(User::class)->findOneBy(['username' => $user->getUsername()]);
             $existingEmail = $entlMng->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
             
-            if ($existingUser)             {
+            if ($existingUser)
+            {
                 $form->addError(new FormError('Пользователь с таким логином уже зарегистрирован'));
                 return $this->render('Authentication/Registration/registration.html.twig', ['registrationForm' => $form,]);
             }
-            if ($existingEmail)             {
+            if ($existingEmail)             
+            {
                 $form->addError(new FormError('Пользователь с таким email уже зарегистрирован'));
                 return $this->render('Authentication/Registration/registration.html.twig', ['registrationForm' => $form,]);
             }
@@ -57,7 +63,8 @@ class RegistrationController extends AbstractController
                 'email' => $user->getEmail(),
                 'passwordHash' => $passwordHash,
                 'code_hash' => hash('sha256', $code),
-                'expires_at' => time() + 600,
+                'expires_at' => time() + self::VERIFICATION_CODE_TTL,
+                'attempts' => 0,
             ]);
 
             $this->sendVerificationEmail($user->getEmail(), $code, $mailer);
@@ -71,12 +78,13 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/registration/verify', name: 'registration_verify')]
-    public function verify(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entlMng): Response
+    public function verify(Request $request, EntityManagerInterface $entlMng): Response
     {
         $session = $request->getSession();
         $pending = $session->get('pending_registration');
 
-        if (!$pending) {
+        if (!$pending) 
+        {
             $this->addFlash('error', 'Нет данных для подтверждения регистрации. Пожалуйста, зарегистрируйтесь заново.');
             return $this->redirectToRoute('registration');
         }
@@ -94,8 +102,18 @@ class RegistrationController extends AbstractController
             }
             
             $inputCode = $form->get('code')->getData();
-            if (hash('sha256', $inputCode) !== $pending['code_hash']) 
-            {
+            if (!hash_equals($pending['code_hash'], hash('sha256', $inputCode))) 
+            {  
+                $pending['attempts'] = ($pending['attempts'] ?? 0) + 1;
+
+                if ($pending['attempts'] >= self::MAX_VERIFICATION_ATTEMPTS) 
+                {
+                    $session->remove('pending_registration');
+                    $this->addFlash('error', 'Превышено количество попыток ввода кода. Пожалуйста, зарегистрируйтесь заново.');
+                    return $this->redirectToRoute('registration');
+                }
+
+                $session->set('pending_registration', $pending);
                 $this->addFlash('error', 'Неверный код подтверждения. Пожалуйста, попробуйте снова.');
                 return $this->redirectToRoute('registration_verify');
             }
@@ -106,7 +124,7 @@ class RegistrationController extends AbstractController
             $user->setEmail($pending['email']);
             $user->setPassword($pending['passwordHash']);
             
-            $entlMng->persist($user);
+            $entityManager->persist($user);
             $entlMng->flush();
             $session->remove('pending_registration');
     
