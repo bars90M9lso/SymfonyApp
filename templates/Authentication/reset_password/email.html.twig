@@ -1,0 +1,9 @@
+<h1>Сброс пароля</h1>
+
+<p>Чтобы изменить пароль, перейдите по ссылке:</p>
+
+<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
+
+<p>Ссылка будет действовать {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+
+<p>Если вы не запрашивали сброс пароля, просто проигнорируйте это письмо.</p>

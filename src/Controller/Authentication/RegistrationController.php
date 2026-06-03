@@ -124,7 +124,7 @@ class RegistrationController extends AbstractController
             $user->setEmail($pending['email']);
             $user->setPassword($pending['passwordHash']);
             
-            $entityManager->persist($user);
+            $entlMng->persist($user);
             $entlMng->flush();
             $session->remove('pending_registration');
     
@@ -146,6 +146,7 @@ class RegistrationController extends AbstractController
             ->htmlTemplate('Authentication/Registration/email.html.twig')
             ->context([
                 'code' => $code,
+                'ttlMinutes' => (int) ceil(self::VERIFICATION_CODE_TTL / 60),
             ])
         ;
 
