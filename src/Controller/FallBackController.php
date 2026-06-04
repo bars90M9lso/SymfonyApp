@@ -10,7 +10,7 @@ final class FallBackController extends AbstractController
 {
     #[Route('/{any}', name: 'fallback', requirements: ['any' => '.*'], priority: -100)]
     public function index(?string $any): Response
-    {    
+    {
         if (str_starts_with($any, 'adm')) {
             return $this->redirectToRoute('admin');
         }
@@ -20,5 +20,11 @@ final class FallBackController extends AbstractController
         }
 
         return $this->redirectToRoute('login');
+    }
+
+    #[Route("/")]
+    public function loginPage(): Response
+    {
+        return $this->redirectToRoute("login");
     }
 }

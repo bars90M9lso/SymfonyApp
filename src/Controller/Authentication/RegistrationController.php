@@ -6,75 +6,50 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Form\EmailVerificationCodeFormType;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\Mime\Address;
+use App\Service\RegistrationService;
+use App\Service\UserManager;
 
 class RegistrationController extends AbstractController
 {
-
-    private const VERIFICATION_CODE_TTL = 600;
-    private const MAX_VERIFICATION_ATTEMPTS = 5;
-
-    public function __construct(
-        #[Autowire('%env(MAILER_FROM_EMAIL)%')]
-        private string $mailerFromEmail,
-        #[Autowire('%env(MAILER_FROM_NAME)%')]
-        private string $mailerFromName
-    ) {
+    public function __construct(private RegistrationService $registrationService, private UserManager $userManager)
+    {
     }
 
     #[Route('/registration', name: 'registration')]
-    public function registration(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entlMng, MailerInterface $mailer): Response 
+    public function registration(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) 
-        {
-            $existingUser = $entlMng->getRepository(User::class)->findOneBy(['username' => $user->getUsername()]);
-            $existingEmail = $entlMng->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
-            
-            if ($existingUser)
-            {
+        if ($form->isSubmitted() && $form->isValid()) {
+            $existingUser = $this->userManager->findByUsername($user->getUsername());
+            $existingEmail = $this->userManager->findByEmail($user->getEmail());
+
+            if ($existingUser) {
                 $form->addError(new FormError('Пользователь с таким логином уже зарегистрирован'));
                 return $this->render('Authentication/Registration/registration.html.twig', ['registrationForm' => $form,]);
             }
-            if ($existingEmail)             
-            {
+            if ($existingEmail) {
                 $form->addError(new FormError('Пользователь с таким email уже зарегистрирован'));
                 return $this->render('Authentication/Registration/registration.html.twig', ['registrationForm' => $form,]);
             }
 
-            $passwordHash = $passwordHasher->hashPassword($user, (string) $form->get('password')->getData(),);
-            $code = (string) random_int(100000, 999999);
-            
-            $request->getSession()->set('pending_registration', [
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'passwordHash' => $passwordHash,
-                'code_hash' => hash('sha256', $code),
-                'expires_at' => time() + self::VERIFICATION_CODE_TTL,
-                'attempts' => 0,
-            ]);
-
-            $this->sendVerificationEmail($user->getEmail(), $code, $mailer);
+            $passwordHash = $passwordHasher->hashPassword($user, (string) $form->get('password')->getData());
+            $this->registrationService->startRegistration($user->getUsername(), $user->getEmail(), $passwordHash, $request->getSession());
             return $this->redirectToRoute('registration_verify');
         }
 
         return $this->render('Authentication/Registration/registration.html.twig', [
             'registrationForm' => $form,
         ]);
-        
+
     }
 
     #[Route('/registration/verify', name: 'registration_verify')]
@@ -83,8 +58,7 @@ class RegistrationController extends AbstractController
         $session = $request->getSession();
         $pending = $session->get('pending_registration');
 
-        if (!$pending) 
-        {
+        if (!$pending) {
             $this->addFlash('error', 'Нет данных для подтверждения регистрации. Пожалуйста, зарегистрируйтесь заново.');
             return $this->redirectToRoute('registration');
         }
@@ -92,64 +66,21 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(EmailVerificationCodeFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) 
-        {
-            if ($pending['expires_at'] < time()) 
-            {
-                $session->remove('pending_registration');
-                $this->addFlash('error', 'Время для подтверждения регистрации истекло. Пожалуйста, зарегистрируйтесь заново.');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $inputCode = $form->get('code')->getData();
+
+            try {
+                $this->registrationService->confirmRegistration($inputCode, $request->getSession());
+                $this->addFlash('success', 'Регистрация прошла успешно. Теперь можно войти.');
+                return $this->redirectToRoute('login');
+            } catch (\RuntimeException $e) {
+                $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('registration');
             }
-            
-            $inputCode = $form->get('code')->getData();
-            if (!hash_equals($pending['code_hash'], hash('sha256', $inputCode))) 
-            {  
-                $pending['attempts'] = ($pending['attempts'] ?? 0) + 1;
-
-                if ($pending['attempts'] >= self::MAX_VERIFICATION_ATTEMPTS) 
-                {
-                    $session->remove('pending_registration');
-                    $this->addFlash('error', 'Превышено количество попыток ввода кода. Пожалуйста, зарегистрируйтесь заново.');
-                    return $this->redirectToRoute('registration');
-                }
-
-                $session->set('pending_registration', $pending);
-                $this->addFlash('error', 'Неверный код подтверждения. Пожалуйста, попробуйте снова.');
-                return $this->redirectToRoute('registration_verify');
-            }
-
-            $user = new User();
-            $user->setUsername($pending['username']);
-  
-            $user->setEmail($pending['email']);
-            $user->setPassword($pending['passwordHash']);
-            
-            $entlMng->persist($user);
-            $entlMng->flush();
-            $session->remove('pending_registration');
-    
-            $this->addFlash('success', 'Регистрация прошла успешно. Теперь можно войти.');
-            return $this->redirectToRoute('login');
         }
 
         return $this->render('Authentication/Registration/verify_email.html.twig', [
             'verificationForm' => $form,
         ]);
-    }
-
-    private function sendVerificationEmail(string $emailAddress, string $code, MailerInterface $mailer): void
-    {
-        $email = (new TemplatedEmail())
-            ->from(new Address($this->mailerFromEmail, $this->mailerFromName))
-            ->to($emailAddress)
-            ->subject('Код подтверждения регистрации')
-            ->htmlTemplate('Authentication/Registration/email.html.twig')
-            ->context([
-                'code' => $code,
-                'ttlMinutes' => (int) ceil(self::VERIFICATION_CODE_TTL / 60),
-            ])
-        ;
-
-        $mailer->send($email);
     }
 }

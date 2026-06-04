@@ -3,7 +3,6 @@
 namespace App\Controller\AdminPanel;
 
 use App\Entity\ListGuest;
-
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -21,7 +20,7 @@ class ListGuestCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         $fields = [
-            IdField::new("id")->onlyOnIndex(), 
+            IdField::new("id")->onlyOnIndex(),
             BooleanField::new("isPresent"),
             TextField::new("name"),
             AssociationField::new('table'),
@@ -32,7 +31,7 @@ class ListGuestCrudController extends AbstractCrudController
 
         elseif($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) { }
         */
-        
-        return $fields;   
+
+        return $fields;
     }
 }

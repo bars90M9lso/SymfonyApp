@@ -4,7 +4,7 @@
 {% trans_default_domain null != ea ? ea.i18n.translationDomain : (translation_domain is defined ? translation_domain ?? 'messages') %}
 
 {% block body_class 'page-login' %}
-{% block page_title %}Подтверждение почты{% endblock %}
+{% block page_title %}{{ page_title is defined ? page_title|raw : (null != ea ? ea.dashboardTitle|raw : '') }}{% endblock %}
 
 {% block head_favicon %}
     {% if favicon_path|default(false) %}

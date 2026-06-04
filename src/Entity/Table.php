@@ -5,14 +5,12 @@ namespace App\Entity;
 use App\Repository\TableRepository;
 use App\ApiResource\TableGuestsController;
 use App\ApiResource\TableStatsController;
-
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
 // Api config
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -159,23 +157,23 @@ class Table
 
         return $this;
     }
-    
+
     #[Groups(['tables:read'])]
     public function getGuests(): int
     {
         return $this->listGuests->count();
     }
-    
+
     #[Groups(['tables:read'])]
     public function getPresentGuests(): int
     {
         return $this->listGuests
-            ->filter(fn(ListGuest $guest) => $guest->getIsPresent())
+            ->filter(fn (ListGuest $guest) => $guest->getIsPresent())
             ->count();
     }
 
-    public function __toString(): string 
-    { 
-        return 'Стол: ' . $this->numTable; 
+    public function __toString(): string
+    {
+        return 'Стол: ' . $this->numTable;
     }
 }

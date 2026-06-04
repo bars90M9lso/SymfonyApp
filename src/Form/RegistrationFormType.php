@@ -17,30 +17,36 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('username', TextType::class,
-            [
-                'constraints' => 
+            ->add(
+                'username',
+                TextType::class,
                 [
-                    new NotBlank(message: 'Пожалуйста, введите логин',),
+                'constraints' =>
+                [
+                    new NotBlank(message: 'Пожалуйста, введите логин', ),
                 ],
 
-            ])
-            
-            ->add('email', EmailType::class,
-            [
+            ]
+            )
+
+            ->add(
+                'email',
+                EmailType::class,
+                [
                 'attr' => ['autocomplete' => 'email'],
-                'constraints' => 
+                'constraints' =>
                 [
-                    new NotBlank(message: 'Пожалуйста, введите email',),
+                    new NotBlank(message: 'Пожалуйста, введите email', ),
                 ],
 
-            ])
-            
+            ]
+            )
+
             ->add('password', PasswordType::class, [
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank(message: 'Пожалуйста, введите пароль',),
+                    new NotBlank(message: 'Пожалуйста, введите пароль', ),
                     new Length(
                         min: 4,
                         minMessage: 'Минимальная длина пароля: 4 символа',
@@ -57,7 +63,7 @@ class RegistrationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'csrf_protection' => true, 
+            'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id' => 'registration_form',
         ]);

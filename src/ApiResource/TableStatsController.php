@@ -13,22 +13,19 @@ class TableStatsController extends AbstractController
     {
         $numTable = $request->query->get('numTable');
 
-        if ($numTable === null || $numTable === '') 
-        {
+        if ($numTable === null || $numTable === '') {
             $tables = $repository->findAll();
 
-            return $this->json(array_map(function ($table) 
-            {
+            return $this->json(array_map(function ($table) {
                 return $this->tableToStats($table);
             }, $tables));
         }
 
         $table = $repository->findOneBy([
-            'numTable' => $numTable  
+            'numTable' => $numTable
         ]);
 
-        if (!$table) 
-        {
+        if (!$table) {
             return $this->json(['error' => 'Table not found'], 404);
         }
 

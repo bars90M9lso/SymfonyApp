@@ -2,9 +2,6 @@
 
 namespace App\Controller\Authentication;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,12 +13,11 @@ class LoginController extends AbstractController
     public function login(AuthenticationUtils $authUtils): Response
     {
         // Проверяем, авторизован ли пользователь
-        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) 
-        {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('admin');
         }
 
-        return $this->render('Authentication/login.html.twig', 
+        return $this->render('Authentication/login.html.twig',
         [
             'error' => $authUtils->getLastAuthenticationError(),
             'last_username' => $authUtils->getLastUsername(),
@@ -37,11 +33,4 @@ class LoginController extends AbstractController
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
-
-    #[Route("/")]
-    public function loginPage(): Response
-    {
-        return $this->redirectToRoute("login");
-    }
-
 }

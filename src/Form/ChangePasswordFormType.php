@@ -34,7 +34,7 @@ class ChangePasswordFormType extends AbstractType
                             minMessage: 'Ваш пароль должен содержать не менее {{ limit }} символов',
                             max: 4096,
                         ),
-                        
+
                         //new PasswordStrength(),
                         //new NotCompromisedPassword(),
                     ],

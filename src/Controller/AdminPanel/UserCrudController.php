@@ -6,7 +6,6 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -19,7 +18,7 @@ class UserCrudController extends AbstractCrudController
 {
     private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher) 
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
         $this->passwordHasher = $passwordHasher;
     }
@@ -31,8 +30,7 @@ class UserCrudController extends AbstractCrudController
 
     public function persistEntity(EntityManagerInterface $entlMng, $entInst): void
     {
-        if (!$entInst instanceof User) 
-        {
+        if (!$entInst instanceof User) {
             return;
         }
 
@@ -40,11 +38,10 @@ class UserCrudController extends AbstractCrudController
 
         parent::persistEntity($entlMng, $entInst);
     }
-    
+
     public function updateEntity(EntityManagerInterface $entlMng, $entInst): void
     {
-        if (!$entInst instanceof User) 
-        {
+        if (!$entInst instanceof User) {
             return;
         }
 
@@ -55,8 +52,7 @@ class UserCrudController extends AbstractCrudController
 
     private function hashPlainPassword(User $user): void
     {
-        if (!$user->getPlainPassword()) 
-        {
+        if (!$user->getPlainPassword()) {
             return;
         }
 
@@ -65,19 +61,16 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = 
+        $fields =
         [
             IdField::new('id')->onlyOnIndex(),
             TextField::new('username'),
             TextField::new('email'),
         ];
-        
-        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL)
-        {
+
+        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
             $fields[] = ArrayField::new('roles');
-        }
-        elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW)
-        {
+        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             $fields[] = ChoiceField::new('roles')
                         ->allowMultipleChoices()
                         ->setChoices([
@@ -87,7 +80,7 @@ class UserCrudController extends AbstractCrudController
 
             $fields[] = TextField::new('plainPassword')->setLabel('Пароль')->onlyOnForms();
         }
-        
-        return $fields;   
+
+        return $fields;
     }
 }

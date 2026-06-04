@@ -10,7 +10,7 @@ class TableGuestsController extends AbstractController
 {
     public function __invoke(Table $table): JsonResponse
     {
-        $guests = $table->getListGuests()->toArray();           
+        $guests = $table->getListGuests()->toArray();
         return $this->json($guests);
     }
 }

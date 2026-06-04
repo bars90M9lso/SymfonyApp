@@ -3,12 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ListGuestRepository;
-
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
-
 // Api config
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
