@@ -32,15 +32,15 @@ class ListGuest
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['listguests:read', 'listguests:write'])]
+    #[Groups(['listguests:read', 'listguests:write', 'tables:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['listguests:read', 'listguests:write'])]
+    #[Groups(['listguests:read', 'listguests:write', 'tables:read'])]
     private ?string $name = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['listguests:read', 'listguests:write'])]
+    #[Groups(['listguests:read', 'listguests:write', 'tables:read'])]
     private ?bool $isPresent = null;
 
     #[ORM\ManyToOne(inversedBy: 'listGuests')]

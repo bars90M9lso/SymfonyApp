@@ -2,6 +2,7 @@
 
 namespace App\ApiResource;
 
+use App\Entity\Table;
 use App\Repository\TableRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +30,7 @@ class TableStatsController extends AbstractController
             return $this->json(['error' => 'Table not found'], 404);
         }
 
-        return $this->tableToStats($table);
+        return $this->json($this->tableToStats($table));
     }
 
     private function tableToStats(Table $table): array

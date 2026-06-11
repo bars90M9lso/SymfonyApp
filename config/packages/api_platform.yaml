@@ -8,3 +8,11 @@ api_platform:
     
     formats:
         json: ['application/json']
+    
+    swagger:
+        persist_authorization: true
+        api_keys:
+            apiKey:
+                name: Authorization
+                type: header
+

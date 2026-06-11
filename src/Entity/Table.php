@@ -59,19 +59,19 @@ class Table
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['tables:read'])]
+    #[Groups(['tables:read', 'listguests:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    #[Groups(['tables:read', 'tables:write'])]
+    #[Groups(['tables:read', 'tables:write', 'listguests:read'])]
     private ?int $numTable = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['tables:read', 'tables:write'])]
+    #[Groups(['tables:read', 'tables:write', 'listguests:read'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['tables:read', 'tables:write'])]
+    #[Groups(['tables:read', 'tables:write', 'listguests:read'])]
     private ?int $maxGuests = null;
 
     /**
@@ -150,7 +150,7 @@ class Table
     {
         return $this->maxGuests;
     }
-
+    
     public function setMaxGuests(?int $maxGuests): static
     {
         $this->maxGuests = $maxGuests;
@@ -158,13 +158,13 @@ class Table
         return $this;
     }
 
-    #[Groups(['tables:read'])]
+    #[Groups(['tables:read', 'listguests:read'])]
     public function getGuests(): int
     {
         return $this->listGuests->count();
     }
 
-    #[Groups(['tables:read'])]
+    #[Groups(['tables:read', 'listguests:read'])]
     public function getPresentGuests(): int
     {
         return $this->listGuests
