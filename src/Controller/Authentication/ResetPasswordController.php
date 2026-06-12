@@ -26,9 +26,6 @@ class ResetPasswordController extends AbstractController
     {
     }
 
-    /**
-     * Display & process form to request a password reset.
-     */
     #[Route('', name: 'app_forgot_password_request')]
     public function request(Request $request, TranslatorInterface $translator): Response
     {
@@ -38,6 +35,7 @@ class ResetPasswordController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var string $email */
             $email = $form->get('email')->getData();
+            $request->getSession()->set('reset_email', $email);
 
             $resetToken = $this->resetPasswordService->generateAndSendResetToken($email);
 
@@ -53,32 +51,32 @@ class ResetPasswordController extends AbstractController
         ]);
     }
 
-    /**
-     * Confirmation page after a user has requested a password reset.
-     */
     #[Route('/check-email', name: 'app_check_email')]
-    public function checkEmail(): Response
+    public function checkEmail(Request $request): Response
     {
-        // Generate a fake token if the user does not exist or someone hit this page directly.
-        // This prevents exposing whether or not a user was found with the given email address or not
+        $session = $request->getSession();
+
+        $email = $session->get('reset_email');
+        $resetToken = $this->getTokenObjectFromSession();
+
+        if (!$email && !$resetToken) {
+            return $this->redirectToRoute('app_forgot_password_request');
+        }
+
         if (null === ($resetToken = $this->getTokenObjectFromSession())) {
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
         return $this->render('Authentication/ResetPassword/check_email.html.twig', [
             'resetToken' => $resetToken,
+            'email' => $email,
         ]);
     }
 
-    /**
-     * Validates and process the reset URL that the user clicked in their email.
-     */
     #[Route('/reset/{token}', name: 'app_reset_password')]
     public function reset(Request $request, UserPasswordHasherInterface $passwordHasher, TranslatorInterface $translator, ?string $token = null): Response
     {
         if ($token) {
-            // We store the token in session and remove it from the URL, to avoid the URL being
-            // loaded in a browser and potentially leaking the token to 3rd party JavaScript.
             $this->storeTokenInSession($token);
 
             return $this->redirectToRoute('app_reset_password');
@@ -87,7 +85,7 @@ class ResetPasswordController extends AbstractController
         $token = $this->getTokenFromSession();
         if (null === $token) {
 
-            $this->addFlash('error', 'Нет токена для сброса пароля. Пожалуйста, запросите сброс пароля заново.');
+            $this->addFlash('error', 'Ссылка для сброса пароля недействительна. Пожалуйста, запросите сброс пароля заново.');
             return $this->redirectToRoute('login');
         }
 

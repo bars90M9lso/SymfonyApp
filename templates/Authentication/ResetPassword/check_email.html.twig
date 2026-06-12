@@ -4,7 +4,12 @@
 {% trans_default_domain null != ea ? ea.i18n.translationDomain : (translation_domain is defined ? translation_domain ?? 'messages') %}
 
 {% block body_class 'page-login' %}
-{% block page_title %}{{ page_title is defined ? page_title|raw : (null != ea ? ea.dashboardTitle|raw : '') }}{% endblock %}
+
+{% block page_title %}
+    <div style="font-size: 2rem; font-weight: 700; text-align: center;">
+        Востановление пароля
+    </div>
+{% endblock %}
 
 {% block head_favicon %}
     {% if favicon_path|default(false) %}
@@ -41,14 +46,14 @@
         <section class="content">
             <div class="form-group">
                 <p class="form-text">
-                    Мы отправили письмо со ссылкой для сброса пароля.
+                    Мы отправили письмо на почту <strong>{{ email }}</strong> со ссылкой для сброса пароля.
                     Ссылка будет действовать {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
                 </p>
             </div>
 
             <div class="mt-3 text-center">
-                <span>Письмо не пришло?</span>
-                <a href="{{ path('app_forgot_password_request') }}">Отправить ещё раз</a>
+                <span>Указан неверный адрес электронной почты?</span>
+                <a href="{{ path('app_forgot_password_request') }}">Исправить</a>
             </div>
 
             <div class="mt-3 text-center">

@@ -5,7 +5,6 @@ namespace App\Controller\Authentication;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Form\EmailVerificationCodeFormType;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,20 +52,29 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/registration/verify', name: 'registration_verify')]
-    public function verify(Request $request, EntityManagerInterface $entlMng): Response
+    public function verify(Request $request): Response
     {
         $session = $request->getSession();
         $pending = $session->get('pending_registration');
+        $resendSeconds = 0;
+        $locked = $pending['locked'] ?? false;
+        $attempts = $pending['attempts'] ?? 0;
 
-        if (!$pending) {
-            $this->addFlash('error', 'Нет данных для подтверждения регистрации. Пожалуйста, зарегистрируйтесь заново.');
+        if (!$pending || empty($pending['email']) || empty($pending['username']) || empty($pending['code_hash']))
+        {
             return $this->redirectToRoute('registration');
+        }
+
+        if (!$locked && isset($pending['resend_available_at']))
+        {
+            $resendSeconds = max(0, $pending['resend_available_at'] - time());
         }
 
         $form = $this->createForm(EmailVerificationCodeFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) 
+        {
             $inputCode = $form->get('code')->getData();
 
             try {
@@ -75,12 +83,42 @@ class RegistrationController extends AbstractController
                 return $this->redirectToRoute('login');
             } catch (\RuntimeException $e) {
                 $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('registration');
+
+                $pending = $session->get('pending_registration');
+
+                $locked = $pending['locked'] ?? false;
+                $attempts = $pending['attempts'] ?? 0;
+
+                $resendSeconds = !$locked ? max(0, ($pending['resend_available_at'] ?? 0) - time()) : 0;
             }
         }
 
         return $this->render('Authentication/Registration/verify_email.html.twig', [
             'verificationForm' => $form,
+            'resendSeconds' => $resendSeconds,
+            'locked' => $locked,
+            'attempts' => $attempts,
         ]);
+    }
+
+    #[Route('/registration/resend-code', name: 'registration_resend_code')]
+    public function resendCode(Request $request): Response
+    {
+        try {
+            $this->registrationService->resendCode(
+                $request->getSession()
+            );
+
+            $this->addFlash(
+                'success',
+                'Новый код подтверждения отправлен на вашу почту.'
+            );
+        } catch (\RuntimeException $e) {
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->redirectToRoute('registration');
+        }
+
+        return $this->redirectToRoute('registration_verify');
     }
 }

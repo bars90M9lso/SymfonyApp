@@ -19,6 +19,10 @@ final class FallBackController extends AbstractController
             return $this->redirectToRoute('registration');
         }
 
+        if (str_starts_with($any, 'res')) {
+            return $this->redirectToRoute('app_forgot_password_request');
+        }
+
         return $this->redirectToRoute('login');
     }
 

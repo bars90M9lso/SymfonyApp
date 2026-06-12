@@ -10,17 +10,10 @@ use App\Service\UserManager;
 
 final class ResetPasswordService
 {
-    public function __construct(
-        private ResetPasswordHelperInterface $resetPasswordHelper,
-        private EntityManagerInterface $entityManager,
-        private UserManager $userManager,
-        private NotificationMailer $notificationMailer
-    ) {
+    public function __construct(private ResetPasswordHelperInterface $resetPasswordHelper, private EntityManagerInterface $entityManager, private UserManager $userManager, private NotificationMailer $notificationMailer) 
+    {
     }
 
-    /**
-     * Generate reset token and send email. Returns the token object or null.
-     */
     public function generateAndSendResetToken(string $email)
     {
         $user = $this->userManager->findByEmail($email);
