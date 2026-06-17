@@ -1,13 +1,15 @@
 {# @var ea \EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider #}
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContext #}
 {% set ea = ea() %}
 {% extends null != ea ? ea.templatePath('layout') : '@EasyAdmin/page/login_minimal.html.twig' %}
-{% trans_default_domain null != ea ? ea.i18n.translationDomain : (translation_domain is defined ? translation_domain ?? 'messages') %}
+{% trans_default_domain 'messages' %}
 
 {% block body_class 'page-login' %}
+{% set flash_messages = app.flashes %}
 
 {% block page_title %}
     <div style="font-size: 2rem; font-weight: 700; text-align: center;">
-        Регистрация
+        {{ 'registration.verification.title'|trans }}
     </div>
 {% endblock %}
 
@@ -22,7 +24,20 @@
 {% block wrapper_wrapper %}
     {% set page_title = block('page_title') %}
 
-    {{ include('@EasyAdmin/flash_messages.html.twig') }}
+    {% if flash_messages|length > 0 %}
+        <div id="flash-messages">
+            {% for label, messages in flash_messages %}
+                {% for message in messages %}
+                    {# the message must be translated outside of the Twig component because
+                    the trans_default_domain value is ignored inside the component #}
+                    {% set translated_message = message|trans %}
+                    <twig:ea:Alert variant="{{ label }}" withDismissButton>
+                        {{ translated_message|raw }}
+                    </twig:ea:Alert>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <div class="login-wrapper">
         <header class="main-header">
@@ -44,26 +59,31 @@
         </header>
 
         <section class="content">
-            {{ form_start(verificationForm) }}
-             
+            {{ form_start(verificationForm, {'attr': {'novalidate': 'novalidate'}}) }}
                 {{ form_errors(verificationForm) }}
 
                 <div class="form-group">
                     <p class="form-text">
-                        Мы отправили код подтверждения на вашу почту. Введите его ниже, чтобы завершить регистрацию.
+                        {{ 'registration.verification.description'|trans }}
                     </p>
                 </div>
 
                 <div class="form-group">
-                    {{ form_label(verificationForm.code, null, {'label_attr': {'class': 'form-control-label required'}}) }}
+                    {{ form_label(verificationForm.code, 'form.EmailVerificationCodeFormType.label'|trans, {'label_attr': {'class': 'form-control-label required'}}) }}
                     <div class="form-widget">
                         {{ form_widget(verificationForm.code, {'attr': {'class': 'form-control', 'autofocus': true}}) }}
                     </div>
                     {{ form_errors(verificationForm.code) }}
                 </div>
 
-                <twig:ea:Button type="submit" variant="primary" size="lg" isBlock htmlAttributes="{{ locked ? {disabled: 'disabled'} : {} }}">
-                    Подтвердить
+                <twig:ea:Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    isBlock
+                    htmlAttributes="{{ locked ? {disabled: 'disabled'} : {} }}"
+                >
+                    {{ 'registration.verification.confirm'|trans }}
                 </twig:ea:Button>
             
             {{ form_end(verificationForm) }}
@@ -73,7 +93,7 @@
 
                 <a id="resend-link"
                 href="{{ path('registration_resend_code') }}">
-                    Отправить код повторно
+                    {{ 'registration.verification.resend'|trans }}
                 </a>
 
             {% else %}
@@ -81,19 +101,23 @@
                 <a id="resend-link"
                 href="{{ path('registration_resend_code') }}"
                 {% if resendSeconds > 0 %}style="display:none"{% endif %}>
-                    Отправить код повторно
+                    {{ 'registration.verification.resend'|trans }}
                 </a>
 
                 <span id="resend-timer"
                     {% if resendSeconds == 0 %}style="display:none"{% endif %}>
-                    Повторная отправка через <span id="countdown">{{ resendSeconds }}</span> сек.
+                    {{ 'registration.verification.resend_after'|trans }}
+                    <span id="countdown">{{ resendSeconds }}</span>
+                    {{ 'registration.verification.seconds'|trans }}
                 </span>
 
             {% endif %}
             </div>
 
             <div class="mt-3 text-center">
-                <a href="{{ path('login') }}">Вернуться ко входу</a>
+                <a href="{{ path('registration_exit') }}">
+                    {{ 'registration.verification.back_to_login'|trans }}
+                </a>
             </div>
 
             {% guard function csp_nonce %}
@@ -124,6 +148,20 @@
                 }
             </script>
             {% endif %}
+
+            <div class="language-switcher">
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({'_locale': 'ru'})) }}"
+                class="{{ app.request.locale == 'ru' ? 'active' : '' }}">
+                    RU
+                </a>
+
+                <span>|</span>
+
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({'_locale': 'en'})) }}"
+                class="{{ app.request.locale == 'en' ? 'active' : '' }}">
+                    EN
+                </a>
+            </div>
 
         </section>
     </div>

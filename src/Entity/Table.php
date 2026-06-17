@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-// Api config
+
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -53,7 +53,7 @@ use ApiPlatform\Metadata\ApiFilter;
 
 #[ORM\Entity(repositoryClass: TableRepository::class)]
 #[ORM\Table(name: 'guest_table')]
-#[UniqueEntity(fields: ['numTable'], message: 'Стол с таким номером уже существует')]
+#[UniqueEntity(fields: ['numTable'], message: 'table.num_table_exists')]
 class Table
 {
     #[ORM\Id]
@@ -174,6 +174,6 @@ class Table
 
     public function __toString(): string
     {
-        return 'Стол: ' . $this->numTable;
+        return '№: ' . $this->numTable;
     }
 }

@@ -11,6 +11,12 @@ class TableGuestsController extends AbstractController
     public function __invoke(Table $table): JsonResponse
     {
         $guests = $table->getListGuests()->toArray();
+        
+        if (!$guests)
+        { 
+            return $this->json(['error' => 'Guest not found'], 404);
+        }
+        
         return $this->json($guests);
     }
 }

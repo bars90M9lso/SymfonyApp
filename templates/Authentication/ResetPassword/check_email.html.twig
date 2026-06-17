@@ -1,13 +1,14 @@
 {# @var ea \EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider #}
 {% set ea = ea() %}
 {% extends null != ea ? ea.templatePath('layout') : '@EasyAdmin/page/login_minimal.html.twig' %}
-{% trans_default_domain null != ea ? ea.i18n.translationDomain : (translation_domain is defined ? translation_domain ?? 'messages') %}
+{% trans_default_domain 'messages' %}
 
 {% block body_class 'page-login' %}
+{% set flash_messages = app.flashes %}
 
 {% block page_title %}
     <div style="font-size: 2rem; font-weight: 700; text-align: center;">
-        Востановление пароля
+        {{ 'reset_password.check_email.title'|trans }}
     </div>
 {% endblock %}
 
@@ -21,8 +22,21 @@
 
 {% block wrapper_wrapper %}
     {% set page_title = block('page_title') %}
-
-    {{ include('@EasyAdmin/flash_messages.html.twig') }}
+    
+    {% if flash_messages|length > 0 %}
+        <div id="flash-messages">
+            {% for label, messages in flash_messages %}
+                {% for message in messages %}
+                    {# the message must be translated outside of the Twig component because
+                    the trans_default_domain value is ignored inside the component #}
+                    {% set translated_message = message|trans %}
+                    <twig:ea:Alert variant="{{ label }}" withDismissButton>
+                        {{ translated_message|raw }}
+                    </twig:ea:Alert>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <div class="login-wrapper">
         <header class="main-header">
@@ -46,18 +60,27 @@
         <section class="content">
             <div class="form-group">
                 <p class="form-text">
-                    Мы отправили письмо на почту <strong>{{ email }}</strong> со ссылкой для сброса пароля.
-                    Ссылка будет действовать {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+                    {{ 'reset_password.check_email.message'|trans({
+                        '%email%': email,
+                        '%expiration%': resetToken.expirationMessageKey|trans(
+                            resetToken.expirationMessageData,
+                            'ResetPasswordBundle'
+                        )
+                    }) }}
                 </p>
             </div>
 
             <div class="mt-3 text-center">
-                <span>Указан неверный адрес электронной почты?</span>
-                <a href="{{ path('app_forgot_password_request') }}">Исправить</a>
+                <span>{{ 'reset_password.check_email.wrong_email'|trans }}</span>
+                <a href="{{ path('app_forgot_password_request') }}">
+                    {{ 'reset_password.check_email.fix_email'|trans }}
+                </a>
             </div>
 
             <div class="mt-3 text-center">
-                <a href="{{ path('login') }}">Вернуться ко входу</a>
+                <a href="{{ path('login') }}">
+                    {{ 'reset_password.check_email.back_to_login'|trans }}
+                </a>
             </div>
 
             {% guard function csp_nonce %}
@@ -65,6 +88,21 @@
             {% else %}
                 <script src="{{ asset('login.js', constant('EasyCorp\\Bundle\\EasyAdminBundle\\Asset\\AssetPackage::PACKAGE_NAME')) }}"></script>
             {% endguard %}
+
+            <div class="language-switcher">
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({'_locale': 'ru'})) }}"
+                class="{{ app.request.locale == 'ru' ? 'active' : '' }}">
+                    RU
+                </a>
+
+                <span>|</span>
+
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({'_locale': 'en'})) }}"
+                class="{{ app.request.locale == 'en' ? 'active' : '' }}">
+                    EN
+                </a>
+            </div>
+
         </section>
     </div>
 {% endblock %}

@@ -1,9 +1,9 @@
-<h1>Сброс пароля</h1>
+<h1>{{ 'reset_password.email_message.title'|trans({}, 'messages', locale) }}</h1>
 
-<p>Чтобы изменить пароль, перейдите по ссылке:</p>
+<p> {{ 'reset_password.email_message.message'|trans({}, 'messages', locale) }} </p>
 
-<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
+<p> <a href="{{ url('app_reset_password', {token: resetToken.token}) }}"> {{ url('app_reset_password', {token: resetToken.token}) }} </a> </p>
 
-<p>Ссылка будет действовать {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+<p> {{ 'reset_password.email_message.expiration'|trans({'%expiration%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }, 'messages', locale) }} </p>
 
-<p>Если вы не запрашивали сброс пароля, просто проигнорируйте это письмо.</p>
+<p> {{ 'reset_password.email_message.ignore'|trans({}, 'messages', locale) }} </p>

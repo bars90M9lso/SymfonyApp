@@ -11,8 +11,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
-#[UniqueEntity(fields: ['username'], message: 'Такой логин уже существует')]
-#[UniqueEntity(fields: ['email'], message: 'Пользователь с таким e-mail уже зарегистрирован')]
+#[UniqueEntity(fields: ['username'], message: 'user.username_exists')]
+#[UniqueEntity(fields: ['email'], message: 'user.email_exists')]
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {

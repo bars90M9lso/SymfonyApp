@@ -5,19 +5,19 @@ namespace App\Controller\Authentication;
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Service\ResetPasswordService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
-#[Route('/reset-password')]
+#[Route('/{_locale}/reset-password')]
 class ResetPasswordController extends AbstractController
 {
     use ResetPasswordControllerTrait;
@@ -26,29 +26,23 @@ class ResetPasswordController extends AbstractController
     {
     }
 
-    #[Route('', name: 'app_forgot_password_request')]
+    #[Route('/', name: 'app_forgot_password_request')]
     public function request(Request $request, TranslatorInterface $translator): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) 
+        {
             /** @var string $email */
             $email = $form->get('email')->getData();
             $request->getSession()->set('reset_email', $email);
 
             $resetToken = $this->resetPasswordService->generateAndSendResetToken($email);
-
-            if ($resetToken) {
-                $this->setTokenObjectInSession($resetToken);
-            }
-
             return $this->redirectToRoute('app_check_email');
         }
 
-        return $this->render('Authentication/ResetPassword/request.html.twig', [
-            'requestForm' => $form,
-        ]);
+        return $this->render('Authentication/ResetPassword/request.html.twig', ['requestForm' => $form,]);
     }
 
     #[Route('/check-email', name: 'app_check_email')]
@@ -59,15 +53,18 @@ class ResetPasswordController extends AbstractController
         $email = $session->get('reset_email');
         $resetToken = $this->getTokenObjectFromSession();
 
-        if (!$email && !$resetToken) {
+        if (!$email && !$resetToken) 
+        {
             return $this->redirectToRoute('app_forgot_password_request');
         }
 
-        if (null === ($resetToken = $this->getTokenObjectFromSession())) {
+        if (null === $resetToken)
+        {
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
-        return $this->render('Authentication/ResetPassword/check_email.html.twig', [
+        return $this->render('Authentication/ResetPassword/check_email.html.twig', 
+        [
             'resetToken' => $resetToken,
             'email' => $email,
         ]);
@@ -76,23 +73,26 @@ class ResetPasswordController extends AbstractController
     #[Route('/reset/{token}', name: 'app_reset_password')]
     public function reset(Request $request, UserPasswordHasherInterface $passwordHasher, TranslatorInterface $translator, ?string $token = null): Response
     {
-        if ($token) {
+        if ($token) 
+        {
             $this->storeTokenInSession($token);
-
             return $this->redirectToRoute('app_reset_password');
         }
 
         $token = $this->getTokenFromSession();
-        if (null === $token) {
-
-            $this->addFlash('error', 'Ссылка для сброса пароля недействительна. Пожалуйста, запросите сброс пароля заново.');
+        if (null === $token) 
+        {
+            $this->addFlash('error', 'notifications.error.invalid_reset_link');
             return $this->redirectToRoute('login');
         }
 
-        try {
+        try 
+        {
             /** @var User $user */
             $user = $this->resetPasswordHelper->validateTokenAndFetchUser($token);
-        } catch (ResetPasswordExceptionInterface $e) {
+
+        } catch (ResetPasswordExceptionInterface $e) 
+        {
             $this->addFlash('reset_password_error', sprintf(
                 '%s - %s',
                 $translator->trans(ResetPasswordExceptionInterface::MESSAGE_PROBLEM_VALIDATE, [], 'ResetPasswordBundle'),
@@ -102,30 +102,25 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_forgot_password_request');
         }
 
-        // The token is valid; allow the user to change their password.
         $form = $this->createForm(ChangePasswordFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // A password reset token should be used only once, remove it.
+        if ($form->isSubmitted() && $form->isValid()) 
+        {
             $this->resetPasswordHelper->removeResetRequest($token);
 
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            // Encode(hash) the plain password, and set it.
             $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
             $this->entityManager->flush();
-
-            // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
-            $this->addFlash('success', 'Пароль успешно изменен.');
+            $this->addFlash('success', 'notifications.success.password_changed');
+            
             return $this->redirectToRoute('login');
         }
 
-        return $this->render('Authentication/ResetPassword/reset.html.twig', [
-            'resetForm' => $form,
-        ]);
+        return $this->render('Authentication/ResetPassword/reset.html.twig', ['resetForm' => $form,]);
     }
 
 }

@@ -9,11 +9,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class LoginController extends AbstractController
 {
-    #[Route("/login", name: "login")]
+    #[Route("/{_locale}/login", name: "login")]
     public function login(AuthenticationUtils $authUtils): Response
     {
-        // Проверяем, авторизован ли пользователь
-        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) 
+        {
             return $this->redirectToRoute('admin');
         }
 

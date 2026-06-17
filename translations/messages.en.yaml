@@ -1,3 +1,83 @@
+login:
+    title: "Login"
+    username: "Username"
+    password: "Password"
+    sign_in: "Sign in"
+    forgot_password: "Forgot password?"
+    no_account: "No account?"
+    register: "Register"
+
+registration:
+    title: "Registration"
+    username: "Username"
+    email: "Email"
+    password: "Password"
+    submit: "Sign Up"
+    have_account: "Already have an account?"
+    login: "Sign In"
+
+    verification:
+        title: "Registration Confirmation"
+        description: "We have sent a verification code to your email address. Enter it below to complete registration."
+        confirm: "Confirm"
+        resend: "Send Code Again"
+        resend_after: "Resend available in"
+        seconds: "sec."
+        back_to_login: "Back to Login"
+    
+    email_message:
+        subject: "Email Verification Code"
+        description: "To complete your registration, enter this code on the website:"
+        expiration: "The code will be valid for %minutes% minutes."
+        ignore: "If you did not request this code, simply ignore this email."
+
+reset_password:
+    request:
+        title: "Password Recovery"
+        email: "Email"
+        description: "Enter your email address and we will send you a password reset link."
+        submit: "Send Link"
+        remembered_password: "Remembered your password?"
+        login: "Sign In"
+
+    check_email:
+        title: "Reset Password"
+        message: >
+            We have sent an email to %email% with a password reset link.
+            The link will be valid for %expiration%.
+        wrong_email: "Wrong email address?"
+        fix_email: "Edit"
+        back_to_login: "Back to login"
+
+    reset:
+        title: "Reset Password"
+        new_password: "New Password"
+        submit: "Change Password"
+        have_access: "Already have access?"
+        login: "Sign In"
+    
+    email_message:
+        subject: "Password Reset"
+        title: "Password Reset"
+        message: "To change your password, follow the link below:"
+        expiration: "The link will remain valid for %expiration%."
+        ignore: "If you did not request a password reset, simply ignore this email."
+
+form:
+    ChangePasswordFormType:
+        new: "New password"
+        repeat: "Repeat password"
+            
+    EmailVerificationCodeFormType:
+        label: "Verification code"
+
+    UserCrudController:
+        password: "Password"
+
+roles:
+    admin: "Admin"
+    user: "User"
+
 entities:
     App\Entity\Table:
         singular: 'Table'
@@ -37,6 +117,25 @@ menu:
     guests: 'Guests'
     user:   'Users'
 
+notifications:
+    success:
+        success_registration: "Registration completed successfully. Please log in."
+        code_sent: "A new verification code has been sent to your email."
+        password_changed: "Password changed successfully."
+
+    error:
+        user_exists: "A user with this username is already registered."
+        email_exists: "A user with this email is already registered."
+        invalid_reset_link: "The password reset link is invalid. Please request a new password reset."
+        no_data_for_resend: "No data available for resending code."
+        no_data_for_confirmation: "No registration data to confirm."
+        too_many_attempts: "Too many verification attempts."
+        expired_verification: "Verification time has expired."
+        invalid_code: "Invalid verification code."
+
 section:
     user: "General Data"
     admin: "Administration"
+
+dashboard:
+    admin_title: "Admin Panel"

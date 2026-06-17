@@ -19,7 +19,8 @@ class ListGuestCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
+        $fields = 
+        [
             IdField::new("id")->onlyOnIndex(),
             BooleanField::new("isPresent"),
             TextField::new("name"),

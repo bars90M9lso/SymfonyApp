@@ -1,0 +1,30 @@
+table:
+    num_table_exists: "Table with such number already exists."
+  
+user:
+    username_exists: "This username is already taken."
+    email_exists: "A user with this email already exists."
+
+form:
+    ChangePasswordFormType:
+        mismatch: "Passwords do not match"
+        not_blank: "Please enter a new password"
+        min_length: "Your password must be at least {{ limit }} characters long"
+    
+    EmailVerificationCodeFormType:
+        not_blank: "Please enter the verification code"
+        length: "Code must be 6 digits"
+        digits_only: "Code must contain only digits"
+    
+    RegistrationFormType:
+        login_not_blank: "Please enter a username"
+        email_not_blank: "Please enter an email address"
+        email_invalid: "Please enter a valid email address"
+        password_not_blank: "Please enter a password"
+        password_min_length: "Your password must be at least {{ limit }} characters long"
+
+    ResetPasswordRequestFormType:
+        email_not_blank: "Please enter an email address"
+
+    UserCrudController:
+        password: "Password"

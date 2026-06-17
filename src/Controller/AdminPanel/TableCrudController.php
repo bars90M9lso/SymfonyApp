@@ -19,11 +19,10 @@ class TableCrudController extends AbstractCrudController
 
     public function deleteEntity(EntityManagerInterface $entlMng, $entInst): void
     {
-        if (!$entInst instanceof Table) {
-            return;
-        }
+        if (!$entInst instanceof Table) { return; }
 
-        foreach ($entInst->getListGuests() as $guest) {
+        foreach ($entInst->getListGuests() as $guest) 
+        {
             $guest->setTable(null);
         }
 
@@ -33,14 +32,16 @@ class TableCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
+        $fields = 
+        [
             IdField::new("id")->onlyOnIndex(),
             IntegerField::new("numTable"),
             TextField::new("description"),
             IntegerField::new("maxGuests"),
         ];
 
-        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
+        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) 
+        {
             $fields[] = IntegerField::new("guests")->onlyOnIndex();
             $fields[] = IntegerField::new("presentGuests")->onlyOnIndex();
         }

@@ -9,6 +9,42 @@ final class RegistrationService
 {
     private const VERIFICATION_CODE_TTL = 600;
     private const MAX_VERIFICATION_ATTEMPTS = 5;
+    private const SESSION_KEY = 'pending_registration';
+
+    private function sendNewCodeOnly(array $pending, SessionInterface $session): void
+    {
+        $code = $this->generateCode();
+        $pending['code_hash'] = hash('sha256', $code);
+        $pending['expires_at'] = time() + self::VERIFICATION_CODE_TTL;
+        $pending['resend_available_at'] = time() + 60;
+        $pending['attempts'] = 0;
+        unset($pending['locked']);
+        $session->set(self::SESSION_KEY, $pending);
+
+        $this->sendCode($pending['email'], $code);
+    }
+
+    private function getPendingRegistration(SessionInterface $session): array
+    {
+        $pending = $session->get(self::SESSION_KEY);
+
+        if (!$pending) 
+        {
+            throw new \RuntimeException('notifications.error.no_data_for_confirmation');
+        }
+
+        return $pending;
+    }
+
+    private function generateCode(): string
+    {
+        return (string) random_int(100000, 999999);
+    }
+
+    private function sendCode(string $email, string $code): void
+    {
+        $this->notificationMailer->sendVerificationCode($email, $code, (int) ceil(self::VERIFICATION_CODE_TTL / 60));
+    }
 
     public function __construct(private NotificationMailer $notificationMailer, private UserManager $userManager)
     {
@@ -16,14 +52,9 @@ final class RegistrationService
 
     public function startRegistration(string $username, string $email, string $passwordHash, SessionInterface $session): void
     {
-        $this->generateAndSendCode($username, $email, $passwordHash,$session);
-    }
-
-    private function generateAndSendCode(string $username, string $email, string $passwordHash, SessionInterface $session): void
-    {
         $code = $this->generateCode();
 
-        $session->set('pending_registration', 
+        $session->set(self::SESSION_KEY, 
         [
             'username' => $username,
             'email' => $email,
@@ -39,83 +70,45 @@ final class RegistrationService
 
     public function resendCode(SessionInterface $session): void
     {
-        $pending = $session->get('pending_registration');
-
-        if (!$pending) {
-            throw new \RuntimeException('Нет данных для повторной отправки кода.');
-            redirectToRoute('registration');    
-        }
-
-        if (empty($pending['locked'])) {
-            if (($pending['resend_available_at'] ?? 0) > time()) {
-                $seconds = $pending['resend_available_at'] - time();
-                throw new \RuntimeException("Подождите {$seconds} сек.");
-            }
-        }
+        $pending = $this->getPendingRegistration($session);
 
         $this->sendNewCodeOnly($pending, $session);
     }
 
-    private function sendNewCodeOnly(array $pending, SessionInterface $session): void
-    {
-        $code = $this->generateCode();
-
-        $pending['code_hash'] = hash('sha256', $code);
-        $pending['expires_at'] = time() + self::VERIFICATION_CODE_TTL;
-        $pending['resend_available_at'] = time() + 60;
-
-        $pending['attempts'] = 0;
-        unset($pending['locked']);
-
-        $session->set('pending_registration', $pending);
-
-        $this->sendCode($pending['email'], $code);
-    }
-
     public function confirmRegistration(string $inputCode, SessionInterface $session): void
     {   
-        $pending = $session->get('pending_registration');
+        $pending = $this->getPendingRegistration($session);
 
-        if (!$pending) {
-            throw new \RuntimeException('Нет данных для подтверждения регистрации.');
-            redirectToRoute('registration');    
+        if (!empty($pending['locked']))
+        { 
+            throw new \RuntimeException('notifications.error.too_many_attempts');
+        }
+        
+        if ($pending['expires_at'] < time()) 
+        {
+            $session->remove(self::SESSION_KEY);
+            throw new \RuntimeException('notifications.error.expired_verification');
         }
 
-        if (!empty($pending['locked'])) {
-            throw new \RuntimeException('Превышено количество попыток ввода кода.');
-        }
-
-        if ($pending['expires_at'] < time()) {
-            $session->remove('pending_registration');
-            throw new \RuntimeException('Время подтверждения регистрации истекло.');
-        }
-
-        if (!hash_equals($pending['code_hash'], hash('sha256', $inputCode))) {
+        if (!hash_equals($pending['code_hash'], hash('sha256', $inputCode))) 
+        {
             $pending['attempts'] = ($pending['attempts'] ?? 0) + 1;
             
-            if ($pending['attempts'] >= self::MAX_VERIFICATION_ATTEMPTS - 1) {
+            if ($pending['attempts'] >= self::MAX_VERIFICATION_ATTEMPTS) 
+            {
                 $pending['locked'] = true;
-                $session->set('pending_registration', $pending);
+                $session->set(self::SESSION_KEY, $pending);
 
-                throw new \RuntimeException('Превышено количество попыток ввода кода.');
+                throw new \RuntimeException('notifications.error.too_many_attempts');
             }
 
-            $session->set('pending_registration', $pending);
+            $session->set(self::SESSION_KEY, $pending);
 
-            throw new \RuntimeException('Неверный код подтверждения.');
+            throw new \RuntimeException('notifications.error.invalid_code');
         }
 
         $this->userManager->createUser($pending['username'], $pending['email'], $pending['passwordHash']);
-        $session->remove('pending_registration');
+        $session->remove(self::SESSION_KEY);
     }
 
-    private function generateCode(): string
-    {
-        return (string) random_int(100000, 999999);
-    }
-
-    private function sendCode(string $email, string $code): void
-    {
-        $this->notificationMailer->sendVerificationCode($email, $code, (int) ceil(self::VERIFICATION_CODE_TTL / 60));
-    }
 }

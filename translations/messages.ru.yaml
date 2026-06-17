@@ -1,3 +1,83 @@
+login:
+    title: "Вход"
+    username: "Логин"
+    password: "Пароль"
+    sign_in: "Войти"
+    forgot_password: "Забыли пароль?"
+    no_account: "Нет аккаунта?"
+    register: "Зарегистрироваться"
+
+registration:
+    title: "Регистрация"
+    username: "Логин"
+    email: "Почта"
+    password: "Пароль"
+    submit: "Зарегистрироваться"
+    have_account: "Уже есть аккаунт?"
+    login: "Войти"
+
+    verification:
+        title: "Подтверждение регистрации"
+        description: "Мы отправили код подтверждения на вашу почту. Введите его ниже, чтобы завершить регистрацию."
+        confirm: "Подтвердить"
+        resend: "Отправить код повторно"
+        resend_after: "Повторная отправка через"
+        seconds: "сек."
+        back_to_login: "Вернуться ко входу"
+
+    email_message:
+        subject: "Код для подтверждения почты"
+        description: "Чтобы завершить регистрацию, введите этот код на сайте:"
+        expiration: "Код будет действовать %minutes% минут."
+        ignore: "Если вы не запрашивали код, просто проигнорируйте это письмо."
+   
+reset_password:
+    request:
+        title: "Восстановление пароля"
+        email: "Почта"
+        description: "Введите почту, и мы отправим ссылку для сброса пароля."
+        submit: "Отправить ссылку"
+        remembered_password: "Вспомнили пароль?"
+        login: "Войти"
+
+    check_email:
+        title: "Восстановление пароля"
+        message: >
+            Мы отправили письмо на почту %email% со ссылкой для сброса пароля.
+            Ссылка будет действовать %expiration%.
+        wrong_email: "Указан неверный адрес электронной почты?"
+        fix_email: "Исправить"
+        back_to_login: "Вернуться ко входу"
+        
+    reset:
+        title: "Восстановление пароля"
+        new_password: "Новый пароль"
+        submit: "Изменить пароль"
+        have_access: "Уже есть доступ?"
+        login: "Войти"
+
+    email_message:
+        subject: "Сброс пароля"
+        title: "Сброс пароля"
+        message: "Чтобы изменить пароль, перейдите по ссылке:"
+        expiration: "Ссылка будет действовать %expiration%."
+        ignore: "Если вы не запрашивали сброс пароля, просто проигнорируйте это письмо."
+
+form:
+    ChangePasswordFormType:
+        new: "Новый пароль"
+        repeat: "Повторите пароль"
+    
+    EmailVerificationCodeFormType:
+        label: "Код подтверждения"
+
+    UserCrudController:
+        password: "Пароль"
+
+roles:
+    admin: "Админ"
+    user: "Пользователь"
+
 entities:
     App\Entity\Table:
         singular: 'Стол'
@@ -10,7 +90,7 @@ entities:
             maxGuests: 'Максимум гостей'
             listGuests: 'Гости'
             guests: 'Количество гостей'
-            presentGuests: 'Присутствуют' 
+            presentGuests: 'Присутствуют'
 
     App\Entity\ListGuest:
         singular: 'Гость'
@@ -32,6 +112,23 @@ entities:
             roles: "Роль"
             email: "Почта"
 
+notifications:
+    success:
+        success_registration: "Регистрация прошла успешно. Теперь можно войти."
+        code_sent: "Новый код подтверждения отправлен на вашу почту."
+        password_changed: "Пароль успешно изменен."
+
+    error:
+        user_exists: "Пользователь с таким логином уже зарегистрирован."
+        email_exists: "Пользователь с таким email уже зарегистрирован."
+        invalid_reset_link: "Ссылка для сброса пароля недействительна или устарела."
+        no_data_for_resend: "Нет данных для повторной отправки кода."
+        no_data_for_confirmation: "Нет данных для подтверждения регистрации."
+        too_many_attempts: "Слишком много попыток верификации."
+        expired_verification: "Время верификации истекло."
+        invalid_code: "Неверный код подтверждения."
+        
+
 menu:
     tables: 'Столы'
     guests: 'Гости'
@@ -40,3 +137,6 @@ menu:
 section:
     user: "Основные данные"
     admin: "Администрирование"
+
+dashboard:
+    admin_title: "Административная панель"

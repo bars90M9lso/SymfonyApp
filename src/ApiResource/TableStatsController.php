@@ -14,7 +14,8 @@ class TableStatsController extends AbstractController
     {
         $numTable = $request->query->get('numTable');
 
-        if ($numTable === null || $numTable === '') {
+        if ($numTable === null || $numTable === '') 
+        {
             $tables = $repository->findAll();
 
             return $this->json(array_map(function ($table) {
@@ -22,20 +23,20 @@ class TableStatsController extends AbstractController
             }, $tables));
         }
 
-        $table = $repository->findOneBy([
-            'numTable' => $numTable
-        ]);
+        $table = $repository->findOneBy(['numTable' => $numTable]);
 
-        if (!$table) {
+        if (!$table)
+        { 
             return $this->json(['error' => 'Table not found'], 404);
         }
-
+        
         return $this->json($this->tableToStats($table));
     }
 
     private function tableToStats(Table $table): array
     {
-        return [
+        return 
+        [
             'id' => $table->getId(),
             'number' => $table->getNumTable(),
             'max_guests' => $table->getMaxGuests(),

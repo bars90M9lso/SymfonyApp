@@ -1,0 +1,30 @@
+table:
+    num_table_exists: "Стол с таким номером уже существует."
+
+user:
+    username_exists: "Такой логин уже существует."
+    email_exists: "Пользователь с таким e-mail уже зарегистрирован."
+
+form:
+    ChangePasswordFormType:
+        mismatch: "Пароли не совпадают"
+        not_blank: "Пожалуйста, введите новый пароль"
+        min_length: "Ваш пароль должен содержать не менее {{ limit }} символов"
+    
+    EmailVerificationCodeFormType:
+        not_blank: "Пожалуйста, введите код подтверждения"
+        length: "Код должен состоять из 6 цифр"
+        digits_only: "Код должен содержать только цифры"
+    
+    RegistrationFormType:
+        login_not_blank: "Пожалуйста, введите логин"
+        email_not_blank: "Пожалуйста, введите email"
+        email_invalid: "Пожалуйста, введите корректный email"
+        password_not_blank: "Пожалуйста, введите пароль"
+        password_min_length: "Ваш пароль должен содержать не менее {{ limit }} символов"
+
+    ResetPasswordRequestFormType:
+        email_not_blank: "Пожалуйста, введите email"
+
+    UserCrudController:
+        password: "Пароль"

@@ -30,31 +30,23 @@ class UserCrudController extends AbstractCrudController
 
     public function persistEntity(EntityManagerInterface $entlMng, $entInst): void
     {
-        if (!$entInst instanceof User) {
-            return;
-        }
+        if (!$entInst instanceof User) { return; }
 
         $this->hashPlainPassword($entInst);
-
         parent::persistEntity($entlMng, $entInst);
     }
 
     public function updateEntity(EntityManagerInterface $entlMng, $entInst): void
     {
-        if (!$entInst instanceof User) {
-            return;
-        }
+        if (!$entInst instanceof User) { return; }
 
         $this->hashPlainPassword($entInst);
-
         parent::updateEntity($entlMng, $entInst);
     }
 
     private function hashPlainPassword(User $user): void
     {
-        if (!$user->getPlainPassword()) {
-            return;
-        }
+        if (!$user->getPlainPassword()) { return; }
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPlainPassword()));
     }
@@ -68,14 +60,16 @@ class UserCrudController extends AbstractCrudController
             TextField::new('email'),
         ];
 
-        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
+        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) 
+        {
             $fields[] = ArrayField::new('roles');
-        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
+        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) 
+        {
             $fields[] = ChoiceField::new('roles')
                         ->allowMultipleChoices()
                         ->setChoices([
-                            'Админ' => 'ROLE_ADMIN',
-                            'Пользователь' => 'ROLE_USER',
+                            'roles.admin' => 'ROLE_ADMIN',
+                            'roles.user' => 'ROLE_USER',
                         ]);
 
             $fields[] = TextField::new('plainPassword')->setLabel('Пароль')->onlyOnForms();

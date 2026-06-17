@@ -1,9 +1,9 @@
-<h1>Код для подтверждения почты</h1>
+<h1>{{ 'registration.email_message.subject'|trans({}, 'messages', locale) }}</h1>
 
-<p>Чтобы завершить регистрацию, введите этот код на сайте:</p>
+<p>{{ 'registration.email_message.description'|trans({}, 'messages', locale) }}</p>
 
 <p><strong>{{ code }}</strong></p>
 
-<p>Код будет действовать {{ ttlMinutes }} минут.</p>
+<p>{{ 'registration.email_message.expiration'|trans({'%minutes%': ttlMinutes}, 'messages', locale) }}</p>
 
-<p>Если вы не запрашивали код, просто проигнорируйте это письмо.</p>
+<p>{{ 'registration.email_message.ignore'|trans({}, 'messages', locale) }}</p>
