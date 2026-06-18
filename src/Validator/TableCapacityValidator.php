@@ -47,7 +47,7 @@ class TableCapacityValidator extends ConstraintValidator
 
         $currentTable = $this->guestRepository->countGuestsAtTableExcludingGuest($table, $value->getId());
 
-        if ($count >= $maxGuests) 
+        if ($count > $maxGuests) 
         {
             $this->context
                 ->buildViolation($constraint->message)
