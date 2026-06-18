@@ -289,6 +289,7 @@ php bin/console make:admin:crud
 Демонстрационная версия проекта доступна по ссылке:
 
 🔗 http://f1266753.xsph.ru/
+🔗 http://ffjhchcgcc.temp.swtest.ru/
 
 ---
 
