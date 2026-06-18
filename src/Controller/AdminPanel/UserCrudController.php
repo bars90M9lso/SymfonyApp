@@ -63,7 +63,8 @@ class UserCrudController extends AbstractCrudController
         if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) 
         {
             $fields[] = ArrayField::new('roles');
-        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) 
+            
+        } elseif ($pageName === Crud::PAGE_EDIT) 
         {
             $fields[] = ChoiceField::new('roles')
                         ->allowMultipleChoices()
@@ -72,7 +73,18 @@ class UserCrudController extends AbstractCrudController
                             'roles.user' => 'ROLE_USER',
                         ]);
 
-            $fields[] = TextField::new('plainPassword')->setLabel('Пароль')->onlyOnForms();
+            $fields[] = TextField::new('plainPassword')->onlyOnForms();
+
+        } elseif ($pageName === Crud::PAGE_NEW) 
+        {
+            $fields[] = ChoiceField::new('roles')
+                        ->allowMultipleChoices()
+                        ->setChoices([
+                            'roles.admin' => 'ROLE_ADMIN',
+                            'roles.user' => 'ROLE_USER',
+                        ]);
+
+            $fields[] = TextField::new('plainPassword')->onlyOnForms()->setRequired(true);
         }
 
         return $fields;

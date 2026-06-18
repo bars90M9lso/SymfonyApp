@@ -111,6 +111,7 @@ entities:
             username: "Логин"
             roles: "Роль"
             email: "Почта"
+            plainPassword: "Пароль"
 
 notifications:
     success:

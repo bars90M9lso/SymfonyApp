@@ -111,6 +111,7 @@ entities:
             username: "Login"
             roles: "Role"
             email: "Email"
+            plainPassword: "Password"
 
 menu:
     tables: 'Tables'
