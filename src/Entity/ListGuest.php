@@ -6,6 +6,7 @@ use App\Repository\ListGuestRepository;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validator\TableCapacity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
@@ -19,7 +20,7 @@ use ApiPlatform\Metadata\ApiFilter;
     denormalizationContext: ['groups' => ['listguests:write']],
     paginationEnabled: false
 )]
-
+#[TableCapacity]
 #[ORM\Entity(repositoryClass: ListGuestRepository::class)]
 class ListGuest
 {

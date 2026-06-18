@@ -1,5 +1,6 @@
 table:
     num_table_exists: "Table with such number already exists."
+    max_guests_reached: 'There are no more empty seats at this table.'
   
 user:
     username_exists: "This username is already taken."

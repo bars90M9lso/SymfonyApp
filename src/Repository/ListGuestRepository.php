@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ListGuest;
+use App\Entity\Table; 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,21 @@ class ListGuestRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ListGuest::class);
+    }
+
+    public function countGuestsAtTableExcludingGuest(Table $table, ?int $guestId): int
+    {
+        $qb = $this->createQueryBuilder('g')
+            ->select('COUNT(g.id)')
+            ->where('g.table = :table')
+            ->setParameter('table', $table);
+
+        if ($guestId !== null) 
+        {
+            $qb->andWhere('g.id != :guestId')->setParameter('guestId', $guestId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
 //    /**
