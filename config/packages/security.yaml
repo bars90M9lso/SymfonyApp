@@ -40,8 +40,8 @@ security:
 
 
     access_control:
-        - { path: ^/admin/.*/user, roles: ROLE_ADMIN }
-        - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/.*/admin/user, roles: ROLE_ADMIN }
+        - { path: ^/.*/admin, roles: ROLE_USER }
 
 when@test:
     security:

@@ -16,11 +16,6 @@ class AdminController extends AbstractDashboardController
 {
     public function index(): Response
     {
-        if (!$this->isGranted('IS_AUTHENTICATED_FULLY'))
-        { 
-            return $this->redirectToRoute('login');
-        }
-
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
         $url = $adminUrlGenerator->setController(TableCrudController::class)->generateUrl();
 
